@@ -22,6 +22,7 @@ def create_tables(conn):
             person_id  INTEGER,
             start_time TEXT,
             end_time TEXT,
+            date TEXT,
             FOREIGN KEY (person_id) REFERENCES person(id)
         );""")
     sql.execute("""
