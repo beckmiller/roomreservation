@@ -120,9 +120,9 @@ def reserve(person, room_id, start_time, end_time):
                         (None, room_id, person.name,
                             start_time, end_time, today,))
 
-        return f"{person.name} you successfully reserved \
+        print(f"{person.name} you successfully reserved \
                 \noffice №{room_id} from {start_time} \
-                \nto {end_time}."
+                \nto {end_time}.")
 
     conn.commit()
     conn.close()
@@ -171,7 +171,8 @@ if __name__ == '__main__':
     person1 = Person('Sasha', 'sasha@gmail.com', 7925864874)
     person2 = Person('Ruslan', 'ruslan@gmai.com', 759456416)
     person3 = Person('Karim', 'karim@gmai.com', 759448856)
-    print(get_room_avaibility(4, '10:00', '11:00'))
-    reserve(person3, 4, '10:00', '11:00')
-    send_email(person1)
+    person6 = Person('Azim', 'azim@alif.tj', 95659989)
+    print(get_room_avaibility(1, '09:00', '10:00'))
+    reserve(person6, 1, '09:00', '10:00')
+    send_email(person6)
 
