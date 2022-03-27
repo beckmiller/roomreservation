@@ -1,6 +1,4 @@
 from datetime import datetime
-from msilib.schema import Error
-import re
 from db import create_connection
 from dataclasses import dataclass
 
@@ -34,8 +32,7 @@ def get_room_avaibility(room_id, start_time, end_time):
             return get_reserved_person(room_id, start_time, end_time)
         else:
             return (
-                f"You can reserve office {room_id}" 
-                f"\nfrom {start_time} to {end_time}"
+                f"You can reserve office {room_id}" f"\nfrom {start_time} to {end_time}"
             )
     else:
         return (
@@ -68,7 +65,7 @@ def request_to_databse(room_id, start_time, end_time):
     Returns:
         sqlite_cursor: Returns respons from database
     """
-    
+
     if check_giving_arguments(room_id, start_time, end_time):
         cursor = conn.cursor()
         query_response = cursor.execute(
@@ -139,7 +136,7 @@ def reserve(person, room_id, start_time, end_time):
         cursor = conn.cursor()
         room_id_query = request_to_databse(room_id, start_time, end_time)
         get_room_id = room_id_query.fetchall()
-        
+
         if get_room_id:
             return print(get_reserved_person(room_id, start_time, end_time))
         elif get_room_id is None:
@@ -218,30 +215,33 @@ def reserve_is_none_update(person, room_id, start_time, end_time):
 
 def send_email(person):
     """Returning an information to person"""
-    cursor = conn.cursor()
-    query = cursor.execute(
-        """SELECT  date, start_time, 
-            end_time, number, email, phone 
-            FROM person 
-                INNER JOIN office 
-                    ON person.id = office.person_id
-                        WHERE office.person_id = (SELECT id 
-                        FROM person 
-                            WHERE name = ?);""",
-        (person.name,),
-    )
+    if isinstance(person, Person):
+        cursor = conn.cursor()
+        query = cursor.execute(
+            """SELECT  date, start_time, 
+                end_time, number, email, phone 
+                FROM person 
+                    INNER JOIN office 
+                        ON person.id = office.person_id
+                            WHERE office.person_id = (SELECT id 
+                            FROM person 
+                                WHERE name = ?);""",
+            (person.name,),
+        )
 
-    date_, start_time, end_time, room_number, email, phone = query.fetchone()
+        date_, start_time, end_time, room_number, email, phone = query.fetchone()
 
-    print(
-        f"To {email} and {phone}:"
-        f"\nYou reserved office {room_number}"
-        f"\nfrom {start_time} to {end_time}"
-        f"\nat {date_}"
-    )
+        print(
+            f"To {email} and {phone}:"
+            f"\nYou reserved office {room_number}"
+            f"\nfrom {start_time} to {end_time}"
+            f"\nat {date_}"
+        )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
+    else:
+        raise TypeError("Giving argument must be instance of a class Person")
 
 
 if __name__ == "__main__":
@@ -250,6 +250,6 @@ if __name__ == "__main__":
     person3 = Person("Karim", "karim@gmai.com", 759448856)
     person6 = Person("Azim", "azim@alif.tj", 95659989)
     person7 = Person("Damir", "damir@gmail.com", 87546547998)
-    print(get_room_avaibility('1', "08:00", "09:00"))
-    reserve(person7, 1, '08:00', '09:00')
+    print(get_room_avaibility("1", "08:00", "09:00"))
+    reserve(person7, 1, "08:00", "09:00")
     send_email(person7)
